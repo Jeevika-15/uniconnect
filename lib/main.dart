@@ -24,6 +24,7 @@ class UniConnectApp extends StatelessWidget {
 
       theme: ThemeData(
         useMaterial3: true,
+
         scaffoldBackgroundColor: cream,
 
         colorScheme: ColorScheme.fromSeed(
@@ -36,38 +37,16 @@ class UniConnectApp extends StatelessWidget {
         appBarTheme: const AppBarTheme(
           backgroundColor: burgundy,
           foregroundColor: Colors.white,
-          centerTitle: false,
           elevation: 0,
         ),
 
-        cardTheme: CardThemeData(
-          color: Colors.white,
-          elevation: 2,
-          margin: const EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 7,
-          ),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18),
-          ),
-        ),
-
-        navigationBarTheme: const NavigationBarThemeData(
-          backgroundColor: Colors.white,
-          indicatorColor: Color(0xFFFFE5E5),
-          elevation: 5,
-        ),
-
-        bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+        bottomNavigationBarTheme:
+        const BottomNavigationBarThemeData(
           backgroundColor: Colors.white,
           selectedItemColor: burgundy,
           unselectedItemColor: Colors.grey,
           type: BottomNavigationBarType.fixed,
-        ),
-
-        floatingActionButtonTheme: const FloatingActionButtonThemeData(
-          backgroundColor: teal,
-          foregroundColor: Colors.white,
+          elevation: 8,
         ),
       ),
 
@@ -89,11 +68,6 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
   int currentIndex = 0;
-
-  final Set<int> registeredActivities = {};
-  final Set<int> favouriteActivities = {};
-
-  final List<String> reminders = [];
 
   final List<Widget> pages = const [
     HomePage(),
@@ -119,7 +93,7 @@ class _MainPageState extends State<MainPage> {
   }
 
   // ----------------------------------------------------------
-  // Reminder dialog
+  // Reminder Dialog
   // ----------------------------------------------------------
 
   void showReminderDialog() {
@@ -130,18 +104,24 @@ class _MainPageState extends State<MainPage> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text(
-            'Add Reminder',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-            ),
+          title: const Row(
+            children: [
+              Icon(
+                Icons.add_alert_outlined,
+                color: UniConnectApp.burgundy,
+              ),
+              SizedBox(width: 10),
+              Text('Add Reminder'),
+            ],
           ),
 
           content: TextField(
             controller: controller,
             decoration: InputDecoration(
               hintText: 'Enter your reminder',
-              prefixIcon: const Icon(Icons.edit_outlined),
+              prefixIcon: const Icon(
+                Icons.edit_outlined,
+              ),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -158,22 +138,17 @@ class _MainPageState extends State<MainPage> {
 
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: UniConnectApp.burgundy,
+                backgroundColor:
+                UniConnectApp.burgundy,
                 foregroundColor: Colors.white,
               ),
 
               onPressed: () {
                 if (controller.text.trim().isNotEmpty) {
-                  setState(() {
-                    reminders.add(
-                      controller.text.trim(),
-                    );
-                  });
-
                   Navigator.pop(context);
 
                   showMessage(
-                    'Reminder added successfully!',
+                    'Reminder added: ${controller.text.trim()}',
                   );
                 }
               },
@@ -183,224 +158,6 @@ class _MainPageState extends State<MainPage> {
           ],
         );
       },
-    );
-  }
-
-  // ----------------------------------------------------------
-  // Drawer
-  // ----------------------------------------------------------
-
-  Widget buildDrawer() {
-    return Drawer(
-      child: Column(
-        children: [
-          // Drawer Header
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.fromLTRB(
-              20,
-              55,
-              20,
-              25,
-            ),
-
-            decoration: const BoxDecoration(
-              color: UniConnectApp.burgundy,
-            ),
-
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Logo
-                Container(
-                  width: 78,
-                  height: 78,
-                  padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.15),
-                        blurRadius: 10,
-                      ),
-                    ],
-                  ),
-
-                  child: ClipOval(
-                    child: Image.asset(
-                      'assets/mody_logo.png',
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 15),
-
-                const Text(
-                  'Jeevika Singathia',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-
-                const SizedBox(height: 4),
-
-                Text(
-                  'Computer Science & Engineering',
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.85),
-                    fontSize: 13,
-                  ),
-                ),
-
-                const SizedBox(height: 3),
-
-                Text(
-                  'Mody University',
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.85),
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // Home
-          ListTile(
-            leading: const Icon(
-              Icons.home_outlined,
-              color: UniConnectApp.burgundy,
-            ),
-            title: const Text('Home'),
-
-            onTap: () {
-              Navigator.pop(context);
-
-              setState(() {
-                currentIndex = 0;
-              });
-            },
-          ),
-
-          // Activities
-          ListTile(
-            leading: const Icon(
-              Icons.event_outlined,
-              color: UniConnectApp.burgundy,
-            ),
-            title: const Text('Activities'),
-
-            onTap: () {
-              Navigator.pop(context);
-
-              setState(() {
-                currentIndex = 1;
-              });
-            },
-          ),
-
-          // Profile
-          ListTile(
-            leading: const Icon(
-              Icons.person_outline,
-              color: UniConnectApp.burgundy,
-            ),
-            title: const Text('Profile'),
-
-            onTap: () {
-              Navigator.pop(context);
-
-              setState(() {
-                currentIndex = 2;
-              });
-            },
-          ),
-
-          const Divider(),
-
-          // My Courses
-          ListTile(
-            leading: const Icon(
-              Icons.menu_book_outlined,
-            ),
-            title: const Text('My Courses'),
-
-            onTap: () {
-              Navigator.pop(context);
-
-              showMessage(
-                'My Courses section selected',
-              );
-            },
-          ),
-
-          // Campus Map
-          ListTile(
-            leading: const Icon(
-              Icons.location_on_outlined,
-            ),
-            title: const Text('Campus Map'),
-
-            onTap: () {
-              Navigator.pop(context);
-
-              showMessage(
-                'Campus Map coming soon!',
-              );
-            },
-          ),
-
-          // Settings
-          ListTile(
-            leading: const Icon(
-              Icons.settings_outlined,
-            ),
-            title: const Text('Settings'),
-
-            onTap: () {
-              Navigator.pop(context);
-
-              showMessage(
-                'Settings selected',
-              );
-            },
-          ),
-
-          // Help Centre
-          ListTile(
-            leading: const Icon(
-              Icons.help_outline,
-            ),
-            title: const Text('Help Centre'),
-
-            onTap: () {
-              Navigator.pop(context);
-
-              showMessage(
-                'Help Centre selected',
-              );
-            },
-          ),
-
-          const Spacer(),
-
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Text(
-              'UniConnect • Mody University',
-              style: TextStyle(
-                color: Colors.grey.shade600,
-                fontSize: 12,
-              ),
-            ),
-          ),
-        ],
-      ),
     );
   }
 
@@ -447,7 +204,19 @@ class _MainPageState extends State<MainPage> {
                 ),
                 title: Text('Campus Update'),
                 subtitle: Text(
-                  'New announcements are available.',
+                  'New campus announcement available.',
+                ),
+              ),
+
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: Icon(
+                  Icons.assignment_outlined,
+                  color: Colors.orange,
+                ),
+                title: Text('Registration'),
+                subtitle: Text(
+                  'Course registration closes soon.',
                 ),
               ),
             ],
@@ -467,7 +236,232 @@ class _MainPageState extends State<MainPage> {
   }
 
   // ----------------------------------------------------------
-  // Build
+  // Drawer
+  // ----------------------------------------------------------
+
+  Widget buildDrawer() {
+    return Drawer(
+      child: Column(
+        children: [
+          // ====================================================
+          // DRAWER HEADER
+          // ====================================================
+
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.fromLTRB(
+              20,
+              55,
+              20,
+              25,
+            ),
+
+            decoration: const BoxDecoration(
+              color: UniConnectApp.burgundy,
+
+              borderRadius: BorderRadius.only(
+                bottomRight: Radius.circular(30),
+              ),
+            ),
+
+            child: Column(
+              crossAxisAlignment:
+              CrossAxisAlignment.start,
+
+              children: [
+                Container(
+                  width: 80,
+                  height: 80,
+                  padding: const EdgeInsets.all(4),
+
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+
+                    boxShadow: [
+                      BoxShadow(
+                        color:
+                        Colors.black.withOpacity(0.15),
+                        blurRadius: 10,
+                      ),
+                    ],
+                  ),
+
+                  child: ClipOval(
+                    child: Image.asset(
+                      'assets/mody_logo.png',
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 15),
+
+                const Text(
+                  'Jeevika Singathia',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+
+                const SizedBox(height: 4),
+
+                Text(
+                  'Computer Science & Engineering',
+                  style: TextStyle(
+                    color:
+                    Colors.white.withOpacity(0.85),
+                    fontSize: 13,
+                  ),
+                ),
+
+                const SizedBox(height: 3),
+
+                Text(
+                  'Mody University',
+                  style: TextStyle(
+                    color:
+                    Colors.white.withOpacity(0.85),
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // ====================================================
+          // DRAWER ITEMS
+          // ====================================================
+
+          ListTile(
+            leading: const Icon(
+              Icons.home_outlined,
+              color: UniConnectApp.burgundy,
+            ),
+            title: const Text('Home'),
+
+            onTap: () {
+              Navigator.pop(context);
+
+              setState(() {
+                currentIndex = 0;
+              });
+            },
+          ),
+
+          ListTile(
+            leading: const Icon(
+              Icons.event_outlined,
+              color: UniConnectApp.burgundy,
+            ),
+            title: const Text('Activities'),
+
+            onTap: () {
+              Navigator.pop(context);
+
+              setState(() {
+                currentIndex = 1;
+              });
+            },
+          ),
+
+          ListTile(
+            leading: const Icon(
+              Icons.person_outline,
+              color: UniConnectApp.burgundy,
+            ),
+            title: const Text('Profile'),
+
+            onTap: () {
+              Navigator.pop(context);
+
+              setState(() {
+                currentIndex = 2;
+              });
+            },
+          ),
+
+          const Divider(),
+
+          ListTile(
+            leading: const Icon(
+              Icons.menu_book_outlined,
+            ),
+            title: const Text('My Courses'),
+
+            onTap: () {
+              Navigator.pop(context);
+              showMessage(
+                'My Courses selected',
+              );
+            },
+          ),
+
+          ListTile(
+            leading: const Icon(
+              Icons.location_on_outlined,
+            ),
+            title: const Text('Campus Map'),
+
+            onTap: () {
+              Navigator.pop(context);
+              showMessage(
+                'Campus Map coming soon!',
+              );
+            },
+          ),
+
+          ListTile(
+            leading: const Icon(
+              Icons.settings_outlined,
+            ),
+            title: const Text('Settings'),
+
+            onTap: () {
+              Navigator.pop(context);
+              showMessage(
+                'Settings selected',
+              );
+            },
+          ),
+
+          ListTile(
+            leading: const Icon(
+              Icons.help_outline,
+            ),
+            title: const Text('Help Centre'),
+
+            onTap: () {
+              Navigator.pop(context);
+              showMessage(
+                'Help Centre selected',
+              );
+            },
+          ),
+
+          const Spacer(),
+
+          Padding(
+            padding: const EdgeInsets.all(16),
+
+            child: Text(
+              'UniConnect • Mody University',
+              style: TextStyle(
+                color: Colors.grey.shade600,
+                fontSize: 12,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ----------------------------------------------------------
+  // MAIN BUILD
   // ----------------------------------------------------------
 
   @override
@@ -476,11 +470,12 @@ class _MainPageState extends State<MainPage> {
       appBar: AppBar(
         title: Row(
           children: [
-            // Small logo in AppBar
+            // Mody Logo
             Container(
               width: 38,
               height: 38,
               padding: const EdgeInsets.all(2),
+
               decoration: const BoxDecoration(
                 color: Colors.white,
                 shape: BoxShape.circle,
@@ -511,7 +506,6 @@ class _MainPageState extends State<MainPage> {
             icon: const Icon(
               Icons.notifications_none_rounded,
             ),
-
             onPressed: showNotifications,
           ),
         ],
@@ -519,18 +513,21 @@ class _MainPageState extends State<MainPage> {
 
       drawer: buildDrawer(),
 
-      // IndexedStack keeps the page states alive.
       body: IndexedStack(
         index: currentIndex,
         children: pages,
       ),
 
-      // --------------------------------------------------------
-      // FAB
-      // --------------------------------------------------------
+      // ========================================================
+      // FLOATING ACTION BUTTON
+      // ========================================================
 
-      floatingActionButton: FloatingActionButton.extended(
+      floatingActionButton:
+      FloatingActionButton.extended(
         onPressed: showReminderDialog,
+
+        backgroundColor: UniConnectApp.teal,
+        foregroundColor: Colors.white,
 
         icon: const Icon(
           Icons.add_alert_outlined,
@@ -544,11 +541,12 @@ class _MainPageState extends State<MainPage> {
         ),
       ),
 
-      // --------------------------------------------------------
-      // Bottom Navigation Bar
-      // --------------------------------------------------------
+      // ========================================================
+      // BOTTOM NAVIGATION
+      // ========================================================
 
-      bottomNavigationBar: BottomNavigationBar(
+      bottomNavigationBar:
+      BottomNavigationBar(
         currentIndex: currentIndex,
 
         onTap: (index) {
@@ -600,79 +598,79 @@ class _MainPageState extends State<MainPage> {
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
-  // ----------------------------------------------------------
-  // Quick Access Card
-  // ----------------------------------------------------------
+  // ==========================================================
+  // ACADEMIC STAT CONTAINER
+  // ==========================================================
 
-  Widget quickAccessCard({
-    required BuildContext context,
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    required VoidCallback onTap,
-  }) {
+  Widget academicStat(
+      String value,
+      String label,
+      IconData icon,
+      ) {
     return Expanded(
-      child: GestureDetector(
-        onTap: onTap,
+      child: Container(
+        height: 90,
 
-        child: Container(
-          padding: const EdgeInsets.all(14),
+        margin: const EdgeInsets.symmetric(
+          horizontal: 4,
+        ),
 
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(18),
+        padding: const EdgeInsets.all(10),
 
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.06),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              ),
-            ],
+        alignment: Alignment.center,
+
+        decoration: BoxDecoration(
+          color: Colors.white,
+
+          borderRadius:
+          BorderRadius.circular(15),
+
+          border: Border.all(
+            color:
+            UniConnectApp.burgundy
+                .withOpacity(0.12),
           ),
 
-          child: Column(
-            crossAxisAlignment:
-            CrossAxisAlignment.start,
+          boxShadow: [
+            BoxShadow(
+              color:
+              Colors.black.withOpacity(0.05),
+              blurRadius: 8,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
 
-            children: [
-              Container(
-                padding: const EdgeInsets.all(10),
+        child: Column(
+          mainAxisAlignment:
+          MainAxisAlignment.center,
 
-                decoration: BoxDecoration(
-                  color: UniConnectApp.cream,
-                  borderRadius:
-                  BorderRadius.circular(12),
-                ),
+          children: [
+            Icon(
+              icon,
+              color: UniConnectApp.burgundy,
+              size: 20,
+            ),
 
-                child: Icon(
-                  icon,
-                  color: UniConnectApp.burgundy,
-                  size: 23,
-                ),
+            const SizedBox(height: 4),
+
+            Text(
+              value,
+              style: const TextStyle(
+                color: UniConnectApp.burgundy,
+                fontSize: 17,
+                fontWeight: FontWeight.bold,
               ),
+            ),
 
-              const SizedBox(height: 10),
-
-              Text(
-                title,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14,
-                ),
+            Text(
+              label,
+              style: TextStyle(
+                color: Colors.grey.shade600,
+                fontSize: 10,
               ),
-
-              const SizedBox(height: 3),
-
-              Text(
-                subtitle,
-                style: TextStyle(
-                  color: Colors.grey.shade600,
-                  fontSize: 11,
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -684,7 +682,7 @@ class HomePage extends StatelessWidget {
       child: SingleChildScrollView(
         padding: const EdgeInsets.only(
           top: 18,
-          bottom: 90,
+          bottom: 100,
         ),
 
         child: Column(
@@ -693,63 +691,21 @@ class HomePage extends StatelessWidget {
 
           children: [
             // ==================================================
-            // GREETING
-            // ==================================================
-
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 20,
-              ),
-
-              child: Column(
-                crossAxisAlignment:
-                CrossAxisAlignment.start,
-
-                children: [
-                  Text(
-                    'Good evening, Jeevika 👋',
-                    style: TextStyle(
-                      color: Colors.grey.shade700,
-                      fontSize: 15,
-                    ),
-                  ),
-
-                  const SizedBox(height: 4),
-
-                  const Text(
-                    'Welcome to UniConnect',
-                    style: TextStyle(
-                      fontSize: 27,
-                      fontWeight: FontWeight.bold,
-                      color: UniConnectApp.charcoal,
-                    ),
-                  ),
-
-                  const SizedBox(height: 4),
-
-                  Text(
-                    'Your Mody University campus companion.',
-                    style: TextStyle(
-                      color: Colors.grey.shade600,
-                      fontSize: 14,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 20),
-
-            // ==================================================
-            // STUDENT DASHBOARD CARD
+            // HEADER CONTAINER
             // ==================================================
 
             Container(
+              width: double.infinity,
+
               margin: const EdgeInsets.symmetric(
                 horizontal: 16,
               ),
 
               padding: const EdgeInsets.all(20),
+
+              constraints: const BoxConstraints(
+                minHeight: 180,
+              ),
 
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
@@ -762,124 +718,171 @@ class HomePage extends StatelessWidget {
                   end: Alignment.bottomRight,
                 ),
 
-                borderRadius: BorderRadius.circular(24),
+                borderRadius:
+                BorderRadius.circular(25),
 
                 boxShadow: [
                   BoxShadow(
-                    color: UniConnectApp.burgundy
+                    color:
+                    UniConnectApp.burgundy
                         .withOpacity(0.25),
-
                     blurRadius: 15,
                     offset: const Offset(0, 7),
                   ),
                 ],
               ),
 
-              child: Column(
-                crossAxisAlignment:
-                CrossAxisAlignment.start,
-
+              child: Row(
                 children: [
-                  Row(
-                    children: [
-                      // Logo
-                      Container(
-                        width: 65,
-                        height: 65,
-                        padding: const EdgeInsets.all(3),
+                  // Logo Container
+                  Container(
+                    width: 75,
+                    height: 75,
+                    padding:
+                    const EdgeInsets.all(4),
 
-                        decoration: const BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
-                        ),
+                    decoration:
+                    const BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                    ),
 
-                        child: ClipOval(
-                          child: Image.asset(
-                            'assets/mody_logo.png',
-                            fit: BoxFit.cover,
+                    child: ClipOval(
+                      child: Image.asset(
+                        'assets/mody_logo.png',
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(width: 15),
+
+                  const Expanded(
+                    child: Column(
+                      crossAxisAlignment:
+                      CrossAxisAlignment.start,
+
+                      mainAxisAlignment:
+                      MainAxisAlignment.center,
+
+                      children: [
+                        Text(
+                          'Good morning, Jeevika 👋',
+                          style: TextStyle(
+                            color: Colors.white70,
+                            fontSize: 13,
                           ),
                         ),
-                      ),
 
-                      const SizedBox(width: 14),
+                        SizedBox(height: 5),
 
-                      const Expanded(
-                        child: Column(
-                          crossAxisAlignment:
-                          CrossAxisAlignment.start,
-
-                          children: [
-                            Text(
-                              'Jeevika Singathia',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 20,
-                                fontWeight:
-                                FontWeight.bold,
-                              ),
-                            ),
-
-                            SizedBox(height: 3),
-
-                            Text(
-                              'Computer Science & Engineering',
-                              style: TextStyle(
-                                color: Colors.white70,
-                                fontSize: 12,
-                              ),
-                            ),
-
-                            SizedBox(height: 2),
-
-                            Text(
-                              'Mody University',
-                              style: TextStyle(
-                                color: Colors.white70,
-                                fontSize: 12,
-                                fontWeight:
-                                FontWeight.w600,
-                              ),
-                            ),
-                          ],
+                        Text(
+                          'Welcome to UniConnect',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 21,
+                            fontWeight:
+                            FontWeight.bold,
+                          ),
                         ),
-                      ),
-                    ],
+
+                        SizedBox(height: 8),
+
+                        Text(
+                          'Computer Science & Engineering',
+                          style: TextStyle(
+                            color: Colors.white70,
+                            fontSize: 12,
+                          ),
+                        ),
+
+                        SizedBox(height: 3),
+
+                        Text(
+                          'Mody University',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 13,
+                            fontWeight:
+                            FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 22),
+
+            // ==================================================
+            // ACADEMIC SNAPSHOT
+            // ==================================================
+
+            const Padding(
+              padding: EdgeInsets.symmetric(
+                horizontal: 20,
+              ),
+
+              child: Text(
+                'Academic Snapshot',
+                style: TextStyle(
+                  fontSize: 19,
+                  fontWeight: FontWeight.bold,
+                  color: UniConnectApp.charcoal,
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 10),
+
+            Container(
+              width: double.infinity,
+
+              margin: const EdgeInsets.symmetric(
+                horizontal: 16,
+              ),
+
+              padding: const EdgeInsets.all(12),
+
+              decoration: BoxDecoration(
+                color: const Color(0xFFF1ECE7),
+
+                borderRadius:
+                BorderRadius.circular(20),
+
+                border: Border.all(
+                  color:
+                  UniConnectApp.burgundy
+                      .withOpacity(0.08),
+                ),
+              ),
+
+              child: Row(
+                children: [
+                  academicStat(
+                    '5',
+                    'Semester',
+                    Icons.school_outlined,
                   ),
 
-                  const SizedBox(height: 20),
-
-                  Container(
-                    height: 1,
-                    color: Colors.white24,
+                  academicStat(
+                    '8.7',
+                    'CGPA',
+                    Icons.grade_outlined,
                   ),
 
-                  const SizedBox(height: 15),
+                  academicStat(
+                    '5',
+                    'Subjects',
+                    Icons.menu_book_outlined,
+                  ),
 
-                  Row(
-                    mainAxisAlignment:
-                    MainAxisAlignment.spaceBetween,
-
-                    children: [
-                      _stat(
-                        'Semester',
-                        '5',
-                      ),
-
-                      _stat(
-                        'CGPA',
-                        '8.7',
-                      ),
-
-                      _stat(
-                        'Subjects',
-                        '5',
-                      ),
-
-                      _stat(
-                        'Events',
-                        '3',
-                      ),
-                    ],
+                  academicStat(
+                    '3',
+                    'Events',
+                    Icons.event_outlined,
                   ),
                 ],
               ),
@@ -905,23 +908,89 @@ class HomePage extends StatelessWidget {
               ),
             ),
 
-            const SizedBox(height: 12),
+            const SizedBox(height: 5),
 
             Padding(
-              padding: const EdgeInsets.symmetric(
+              padding:
+              const EdgeInsets.symmetric(
                 horizontal: 16,
               ),
 
-              child: Row(
+              child: Text(
+                'Everything you need on campus.',
+                style: TextStyle(
+                  color: Colors.grey.shade600,
+                  fontSize: 13,
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 10),
+
+            // Wrap = responsive layout
+            Padding(
+              padding:
+              const EdgeInsets.symmetric(
+                horizontal: 11,
+              ),
+
+              child: Wrap(
+                alignment: WrapAlignment.center,
+
                 children: [
-                  quickAccessCard(
-                    context: context,
-                    icon: Icons.menu_book_outlined,
+                  CampusActionCard(
+                    icon: Icons
+                        .calendar_month_outlined,
+                    title: 'Timetable',
+                    subtitle: 'View schedule',
+                    color:
+                    UniConnectApp.burgundy,
+
+                    onTap: () {
+                      ScaffoldMessenger.of(
+                        context,
+                      ).showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                            'Timetable opened',
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+
+                  CampusActionCard(
+                    icon:
+                    Icons.grade_outlined,
+                    title: 'Results',
+                    subtitle: 'Check grades',
+                    color:
+                    UniConnectApp.teal,
+
+                    onTap: () {
+                      ScaffoldMessenger.of(
+                        context,
+                      ).showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                            'Results opened',
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+
+                  CampusActionCard(
+                    icon:
+                    Icons.menu_book_outlined,
                     title: 'Library',
                     subtitle: 'Books & resources',
+                    color: Colors.orange,
+
                     onTap: () {
-                      ScaffoldMessenger.of(context)
-                          .showSnackBar(
+                      ScaffoldMessenger.of(
+                        context,
+                      ).showSnackBar(
                         const SnackBar(
                           content: Text(
                             'Library opened',
@@ -931,38 +1000,20 @@ class HomePage extends StatelessWidget {
                     },
                   ),
 
-                  const SizedBox(width: 10),
+                  CampusActionCard(
+                    icon:
+                    Icons.directions_bus_outlined,
+                    title: 'Shuttle',
+                    subtitle: 'Transport info',
+                    color: Colors.deepPurple,
 
-                  quickAccessCard(
-                    context: context,
-                    icon: Icons.calendar_month_outlined,
-                    title: 'Schedule',
-                    subtitle: 'View timetable',
                     onTap: () {
-                      ScaffoldMessenger.of(context)
-                          .showSnackBar(
+                      ScaffoldMessenger.of(
+                        context,
+                      ).showSnackBar(
                         const SnackBar(
                           content: Text(
-                            'Schedule opened',
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-
-                  const SizedBox(width: 10),
-
-                  quickAccessCard(
-                    context: context,
-                    icon: Icons.location_on_outlined,
-                    title: 'Campus',
-                    subtitle: 'Find locations',
-                    onTap: () {
-                      ScaffoldMessenger.of(context)
-                          .showSnackBar(
-                        const SnackBar(
-                          content: Text(
-                            'Campus map opened',
+                            'Shuttle information opened',
                           ),
                         ),
                       );
@@ -972,10 +1023,10 @@ class HomePage extends StatelessWidget {
               ),
             ),
 
-            const SizedBox(height: 25),
+            const SizedBox(height: 20),
 
             // ==================================================
-            // UPCOMING EVENT
+            // CAMPUS ANNOUNCEMENT
             // ==================================================
 
             const Padding(
@@ -984,7 +1035,7 @@ class HomePage extends StatelessWidget {
               ),
 
               child: Text(
-                'Upcoming',
+                'Campus Announcement',
                 style: TextStyle(
                   fontSize: 19,
                   fontWeight: FontWeight.bold,
@@ -994,39 +1045,84 @@ class HomePage extends StatelessWidget {
 
             const SizedBox(height: 10),
 
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
+            GestureDetector(
+              onTap: () {
+                ScaffoldMessenger.of(context)
+                    .showSnackBar(
+                  const SnackBar(
+                    content: Text(
+                      'Course registration details opened',
+                    ),
+                  ),
+                );
+              },
+
+              child: Container(
+                width: double.infinity,
+
+                margin: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                ),
+
+                padding: const EdgeInsets.all(18),
+
+                alignment: Alignment.centerLeft,
+
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFF4D6),
+
+                  borderRadius:
+                  BorderRadius.circular(18),
+
+                  border: Border.all(
+                    color:
+                    Colors.orange.withOpacity(0.35),
+                  ),
+
+                  boxShadow: [
+                    BoxShadow(
+                      color:
+                      Colors.black.withOpacity(0.04),
+                      blurRadius: 7,
+                    ),
+                  ],
+                ),
 
                 child: Row(
                   children: [
                     Container(
-                      width: 58,
-                      height: 58,
+                      width: 48,
+                      height: 48,
+
+                      alignment:
+                      Alignment.center,
 
                       decoration: BoxDecoration(
-                        color: UniConnectApp.cream,
+                        color: Colors.orange,
                         borderRadius:
-                        BorderRadius.circular(15),
+                        BorderRadius.circular(
+                            13),
                       ),
 
                       child: const Icon(
-                        Icons.psychology_outlined,
-                        color: UniConnectApp.teal,
-                        size: 30,
+                        Icons
+                            .campaign_outlined,
+                        color: Colors.white,
+                        size: 25,
                       ),
                     ),
 
-                    const SizedBox(width: 14),
+                    const SizedBox(width: 13),
 
                     const Expanded(
                       child: Column(
                         crossAxisAlignment:
-                        CrossAxisAlignment.start,
+                        CrossAxisAlignment
+                            .start,
 
                         children: [
                           Text(
-                            'Machine Learning Workshop',
+                            'Course Registration',
                             style: TextStyle(
                               fontWeight:
                               FontWeight.bold,
@@ -1037,23 +1133,23 @@ class HomePage extends StatelessWidget {
                           SizedBox(height: 5),
 
                           Text(
-                            'Tomorrow • 10:00 AM',
+                            'Registration closes on 5 October 2026.',
                             style: TextStyle(
-                              color:
-                              UniConnectApp.burgundy,
                               fontSize: 12,
-                              fontWeight:
-                              FontWeight.w600,
                             ),
                           ),
 
-                          SizedBox(height: 3),
+                          SizedBox(height: 4),
 
                           Text(
-                            'Computer Lab • Block A',
+                            'Tap to view details',
                             style: TextStyle(
-                              color: Colors.grey,
-                              fontSize: 12,
+                              color:
+                              UniConnectApp
+                                  .burgundy,
+                              fontWeight:
+                              FontWeight.w600,
+                              fontSize: 11,
                             ),
                           ),
                         ],
@@ -1061,19 +1157,20 @@ class HomePage extends StatelessWidget {
                     ),
 
                     const Icon(
-                      Icons.arrow_forward_ios,
+                      Icons
+                          .arrow_forward_ios,
                       size: 15,
-                      color: Colors.grey,
+                      color: Colors.orange,
                     ),
                   ],
                 ),
               ),
             ),
 
-            const SizedBox(height: 15),
+            const SizedBox(height: 25),
 
             // ==================================================
-            // CAMPUS UPDATES
+            // STUDENT LIFE
             // ==================================================
 
             const Padding(
@@ -1082,7 +1179,7 @@ class HomePage extends StatelessWidget {
               ),
 
               child: Text(
-                'Campus Updates',
+                'Student Life',
                 style: TextStyle(
                   fontSize: 19,
                   fontWeight: FontWeight.bold,
@@ -1090,80 +1187,242 @@ class HomePage extends StatelessWidget {
               ),
             ),
 
-            const SizedBox(height: 8),
+            const SizedBox(height: 10),
 
-            Card(
-              child: Column(
+            Container(
+              width: double.infinity,
+
+              margin: const EdgeInsets.symmetric(
+                horizontal: 16,
+              ),
+
+              padding: const EdgeInsets.all(16),
+
+              decoration: BoxDecoration(
+                color: Colors.white,
+
+                borderRadius:
+                BorderRadius.circular(20),
+
+                border: Border.all(
+                  color:
+                  UniConnectApp.teal
+                      .withOpacity(0.15),
+                ),
+
+                boxShadow: [
+                  BoxShadow(
+                    color:
+                    Colors.black.withOpacity(0.06),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+
+              child: Row(
                 children: [
-                  ListTile(
-                    leading: Container(
-                      padding:
-                      const EdgeInsets.all(9),
+                  // Event date tile
+                  Container(
+                    width: 65,
+                    height: 75,
 
-                      decoration: BoxDecoration(
-                        color: UniConnectApp.cream,
-                        borderRadius:
-                        BorderRadius.circular(12),
-                      ),
+                    alignment:
+                    Alignment.center,
 
-                      child: const Icon(
-                        Icons.campaign_outlined,
+                    decoration: BoxDecoration(
+                      color:
+                      const Color(0xFFE6F7F5),
+
+                      borderRadius:
+                      BorderRadius.circular(
+                          15),
+
+                      border: Border.all(
                         color:
-                        UniConnectApp.burgundy,
+                        UniConnectApp.teal
+                            .withOpacity(0.2),
                       ),
                     ),
 
-                    title: const Text(
-                      'New campus announcement',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
+                    child: const Column(
+                      mainAxisAlignment:
+                      MainAxisAlignment
+                          .center,
 
-                    subtitle: const Text(
-                      'Check the latest university updates.',
-                    ),
+                      children: [
+                        Text(
+                          '10',
+                          style: TextStyle(
+                            color:
+                            UniConnectApp
+                                .teal,
+                            fontSize: 22,
+                            fontWeight:
+                            FontWeight.bold,
+                          ),
+                        ),
 
-                    trailing: const Icon(
-                      Icons.chevron_right,
+                        Text(
+                          'OCT',
+                          style: TextStyle(
+                            color:
+                            UniConnectApp
+                                .teal,
+                            fontSize: 11,
+                            fontWeight:
+                            FontWeight.w600,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
 
-                  const Divider(
-                    height: 1,
+                  const SizedBox(width: 14),
+
+                  const Expanded(
+                    child: Column(
+                      crossAxisAlignment:
+                      CrossAxisAlignment
+                          .start,
+
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                'Career Discovery Workshop',
+                                style: TextStyle(
+                                  fontWeight:
+                                  FontWeight
+                                      .bold,
+                                  fontSize: 15,
+                                ),
+                              ),
+                            ),
+
+                            // Status badge
+                            Text(
+                              'NEW',
+                              style: TextStyle(
+                                color:
+                                Colors.white,
+                                backgroundColor:
+                                UniConnectApp
+                                    .teal,
+                                fontSize: 9,
+                                fontWeight:
+                                FontWeight
+                                    .bold,
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        SizedBox(height: 6),
+
+                        Text(
+                          '10:00 AM • Seminar Hall',
+                          style: TextStyle(
+                            color:
+                            UniConnectApp
+                                .burgundy,
+                            fontSize: 12,
+                            fontWeight:
+                            FontWeight.w600,
+                          ),
+                        ),
+
+                        SizedBox(height: 4),
+
+                        Text(
+                          'Meet industry professionals and learn about internships and placements.',
+                          style: TextStyle(
+                            color: Colors.grey,
+                            fontSize: 12,
+                            height: 1.3,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            // ==================================================
+            // MENTION / UNIVERSITY CONTAINER
+            // ==================================================
+
+            Container(
+              width: double.infinity,
+
+              margin: const EdgeInsets.symmetric(
+                horizontal: 16,
+              ),
+
+              padding: const EdgeInsets.all(18),
+
+              decoration: BoxDecoration(
+                color:
+                const Color(0xFFF1ECE7),
+
+                borderRadius:
+                BorderRadius.circular(18),
+
+                border: Border.all(
+                  color:
+                  UniConnectApp.burgundy
+                      .withOpacity(0.12),
+                ),
+              ),
+
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.account_balance,
+                    color:
+                    UniConnectApp.burgundy,
+                    size: 30,
                   ),
 
-                  ListTile(
-                    leading: Container(
-                      padding:
-                      const EdgeInsets.all(9),
+                  const SizedBox(width: 13),
 
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFE6F7F5),
-                        borderRadius:
-                        BorderRadius.circular(12),
-                      ),
+                  const Expanded(
+                    child: Column(
+                      crossAxisAlignment:
+                      CrossAxisAlignment
+                          .start,
 
-                      child: const Icon(
-                        Icons.school_outlined,
-                        color: UniConnectApp.teal,
-                      ),
+                      children: [
+                        Text(
+                          'Mody University',
+                          style: TextStyle(
+                            fontWeight:
+                            FontWeight.bold,
+                            fontSize: 15,
+                          ),
+                        ),
+
+                        SizedBox(height: 3),
+
+                        Text(
+                          'Student Campus Portal',
+                          style: TextStyle(
+                            color: Colors.grey,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
                     ),
+                  ),
 
-                    title: const Text(
-                      'Academic resources',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-
-                    subtitle: const Text(
-                      'Access your courses and learning materials.',
-                    ),
-
-                    trailing: const Icon(
-                      Icons.chevron_right,
-                    ),
+                  const Icon(
+                    Icons.verified,
+                    color:
+                    UniConnectApp.teal,
                   ),
                 ],
               ),
@@ -1173,36 +1432,114 @@ class HomePage extends StatelessWidget {
       ),
     );
   }
+}
 
-  // ----------------------------------------------------------
-  // Dashboard Stat
-  // ----------------------------------------------------------
+// ============================================================
+// REUSABLE CAMPUS ACTION CARD
+// ============================================================
 
-  static Widget _stat(
-      String title,
-      String value,
-      ) {
-    return Column(
-      children: [
-        Text(
-          value,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
+class CampusActionCard extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final Color color;
+  final VoidCallback onTap;
+
+  const CampusActionCard({
+    super.key,
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+
+      child: Container(
+        width: 160,
+        height: 120,
+
+        margin: const EdgeInsets.all(5),
+
+        padding: const EdgeInsets.all(15),
+
+        alignment: Alignment.centerLeft,
+
+        constraints: const BoxConstraints(
+          minHeight: 110,
         ),
 
-        const SizedBox(height: 3),
+        decoration: BoxDecoration(
+          color: Colors.white,
 
-        Text(
-          title,
-          style: const TextStyle(
-            color: Colors.white70,
-            fontSize: 11,
+          borderRadius:
+          BorderRadius.circular(18),
+
+          border: Border.all(
+            color: color.withOpacity(0.25),
+            width: 1.2,
           ),
+
+          boxShadow: [
+            BoxShadow(
+              color:
+              Colors.black.withOpacity(0.06),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
-      ],
+
+        child: Column(
+          crossAxisAlignment:
+          CrossAxisAlignment.start,
+
+          children: [
+            Container(
+              width: 42,
+              height: 42,
+
+              alignment: Alignment.center,
+
+              decoration: BoxDecoration(
+                color: color.withOpacity(0.10),
+                borderRadius:
+                BorderRadius.circular(12),
+              ),
+
+              child: Icon(
+                icon,
+                color: color,
+                size: 23,
+              ),
+            ),
+
+            const Spacer(),
+
+            Text(
+              title,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+              ),
+            ),
+
+            const SizedBox(height: 3),
+
+            Text(
+              subtitle,
+              style: TextStyle(
+                color: Colors.grey.shade600,
+                fontSize: 11,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -1222,6 +1559,8 @@ class ActivitiesPage extends StatefulWidget {
 class _ActivitiesPageState
     extends State<ActivitiesPage> {
 
+  // IMPORTANT:
+  // These belong to ActivitiesPage.
   final Set<int> registeredActivities = {};
   final Set<int> favouriteActivities = {};
 
@@ -1244,7 +1583,8 @@ class _ActivitiesPageState
       'location': 'University Sports Ground',
       'description':
       'Take part in exciting sports activities and compete with students across campus.',
-      'icon': Icons.sports_basketball,
+      'icon':
+      Icons.sports_basketball,
       'color': UniConnectApp.teal,
     },
 
@@ -1256,7 +1596,7 @@ class _ActivitiesPageState
       'description':
       'Enjoy music, dance and cultural performances organised by university students.',
       'icon': Icons.music_note,
-      'color': Color(0xFF92400E),
+      'color': Colors.orange,
     },
 
     {
@@ -1265,15 +1605,20 @@ class _ActivitiesPageState
       'time': '2:00 PM - 4:00 PM',
       'location': 'Seminar Hall',
       'description':
-      'Get useful guidance about internships, placements, resumes and interview preparation.',
+      'Get useful guidance about internships, placements, resumes and interviews.',
       'icon': Icons.work_outline,
-      'color': Color(0xFF57534E),
+      'color': Colors.deepPurple,
     },
   ];
 
+  // ----------------------------------------------------------
+  // Registration
+  // ----------------------------------------------------------
+
   void toggleRegistration(int index) {
     setState(() {
-      if (registeredActivities.contains(index)) {
+      if (registeredActivities
+          .contains(index)) {
         registeredActivities.remove(index);
       } else {
         registeredActivities.add(index);
@@ -1283,19 +1628,29 @@ class _ActivitiesPageState
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          registeredActivities.contains(index)
+          registeredActivities
+              .contains(index)
               ? 'Registered for ${activities[index]['title']}'
               : 'Registration cancelled',
         ),
-        behavior: SnackBarBehavior.floating,
-        backgroundColor: UniConnectApp.burgundy,
+
+        behavior:
+        SnackBarBehavior.floating,
+
+        backgroundColor:
+        UniConnectApp.burgundy,
       ),
     );
   }
 
+  // ----------------------------------------------------------
+  // Favourite
+  // ----------------------------------------------------------
+
   void toggleFavourite(int index) {
     setState(() {
-      if (favouriteActivities.contains(index)) {
+      if (favouriteActivities
+          .contains(index)) {
         favouriteActivities.remove(index);
       } else {
         favouriteActivities.add(index);
@@ -1305,11 +1660,14 @@ class _ActivitiesPageState
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          favouriteActivities.contains(index)
+          favouriteActivities
+              .contains(index)
               ? 'Added to favourites ⭐'
               : 'Removed from favourites',
         ),
-        behavior: SnackBarBehavior.floating,
+
+        behavior:
+        SnackBarBehavior.floating,
       ),
     );
   }
@@ -1338,7 +1696,8 @@ class _ActivitiesPageState
                 style: TextStyle(
                   fontSize: 26,
                   fontWeight: FontWeight.bold,
-                  color: UniConnectApp.charcoal,
+                  color:
+                  UniConnectApp.charcoal,
                 ),
               ),
             ),
@@ -1351,7 +1710,7 @@ class _ActivitiesPageState
               ),
 
               child: Text(
-                'Discover events and activities happening at Mody University.',
+                'Discover events happening at Mody University.',
                 style: TextStyle(
                   color: Colors.grey.shade600,
                   fontSize: 14,
@@ -1376,18 +1735,26 @@ class _ActivitiesPageState
                     .contains(index);
 
                 return Card(
+                  margin:
+                  const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 7,
+                  ),
+
                   child: Padding(
                     padding:
                     const EdgeInsets.all(16),
 
                     child: Column(
                       crossAxisAlignment:
-                      CrossAxisAlignment.start,
+                      CrossAxisAlignment
+                          .start,
 
                       children: [
                         Row(
                           crossAxisAlignment:
-                          CrossAxisAlignment.start,
+                          CrossAxisAlignment
+                              .start,
 
                           children: [
                             // Activity icon
@@ -1395,15 +1762,21 @@ class _ActivitiesPageState
                               width: 55,
                               height: 55,
 
+                              alignment:
+                              Alignment.center,
+
                               decoration:
                               BoxDecoration(
                                 color:
-                                (activity['color']
+                                (activity[
+                                'color']
                                 as Color)
                                     .withOpacity(
                                     0.10),
+
                                 borderRadius:
-                                BorderRadius.circular(
+                                BorderRadius
+                                    .circular(
                                     15),
                               ),
 
@@ -1411,13 +1784,16 @@ class _ActivitiesPageState
                                 activity['icon']
                                 as IconData,
                                 color:
-                                activity['color']
+                                activity[
+                                'color']
                                 as Color,
                                 size: 27,
                               ),
                             ),
 
-                            const SizedBox(width: 13),
+                            const SizedBox(
+                              width: 13,
+                            ),
 
                             Expanded(
                               child: Column(
@@ -1427,21 +1803,25 @@ class _ActivitiesPageState
 
                                 children: [
                                   Text(
-                                    activity['title']
+                                    activity[
+                                    'title']
                                     as String,
 
                                     style:
                                     const TextStyle(
                                       fontSize: 16,
                                       fontWeight:
-                                      FontWeight.bold,
+                                      FontWeight
+                                          .bold,
                                     ),
                                   ),
 
-                                  const SizedBox(height: 5),
+                                  const SizedBox(
+                                      height: 5),
 
                                   Text(
-                                    activity['date']
+                                    activity[
+                                    'date']
                                     as String,
 
                                     style:
@@ -1449,9 +1829,10 @@ class _ActivitiesPageState
                                       color:
                                       UniConnectApp
                                           .burgundy,
-                                      fontWeight:
-                                      FontWeight.w600,
                                       fontSize: 12,
+                                      fontWeight:
+                                      FontWeight
+                                          .w600,
                                     ),
                                   ),
                                 ],
@@ -1468,7 +1849,9 @@ class _ActivitiesPageState
                               icon: Icon(
                                 isFavourite
                                     ? Icons.star
-                                    : Icons.star_border,
+                                    : Icons
+                                    .star_border,
+
                                 color: isFavourite
                                     ? Colors.amber
                                     : Colors.grey,
@@ -1477,10 +1860,12 @@ class _ActivitiesPageState
                           ],
                         ),
 
-                        const SizedBox(height: 14),
+                        const SizedBox(
+                            height: 14),
 
                         Text(
-                          activity['description']
+                          activity[
+                          'description']
                           as String,
 
                           style: TextStyle(
@@ -1491,19 +1876,21 @@ class _ActivitiesPageState
                           ),
                         ),
 
-                        const SizedBox(height: 14),
+                        const SizedBox(
+                            height: 14),
 
-                        // Time
                         Row(
                           children: [
                             const Icon(
                               Icons.access_time,
                               size: 17,
                               color:
-                              UniConnectApp.teal,
+                              UniConnectApp
+                                  .teal,
                             ),
 
-                            const SizedBox(width: 7),
+                            const SizedBox(
+                                width: 7),
 
                             Text(
                               activity['time']
@@ -1519,42 +1906,49 @@ class _ActivitiesPageState
                           ],
                         ),
 
-                        const SizedBox(height: 7),
+                        const SizedBox(
+                            height: 7),
 
-                        // Location
                         Row(
                           children: [
                             const Icon(
-                              Icons.location_on_outlined,
+                              Icons
+                                  .location_on_outlined,
                               size: 17,
                               color:
-                              UniConnectApp.teal,
+                              UniConnectApp
+                                  .teal,
                             ),
 
-                            const SizedBox(width: 7),
+                            const SizedBox(
+                                width: 7),
 
                             Expanded(
                               child: Text(
-                                activity['location']
+                                activity[
+                                'location']
                                 as String,
 
                                 style:
                                 const TextStyle(
                                   fontSize: 12,
                                   fontWeight:
-                                  FontWeight.w500,
+                                  FontWeight
+                                      .w500,
                                 ),
                               ),
                             ),
                           ],
                         ),
 
-                        const SizedBox(height: 15),
+                        const SizedBox(
+                            height: 15),
 
                         SizedBox(
                           width: double.infinity,
 
-                          child: ElevatedButton.icon(
+                          child:
+                          ElevatedButton.icon(
                             onPressed: () {
                               toggleRegistration(
                                 index,
@@ -1563,7 +1957,8 @@ class _ActivitiesPageState
 
                             icon: Icon(
                               isRegistered
-                                  ? Icons.check_circle
+                                  ? Icons
+                                  .check_circle
                                   : Icons
                                   .calendar_month,
                             ),
@@ -1595,7 +1990,8 @@ class _ActivitiesPageState
                               shape:
                               RoundedRectangleBorder(
                                 borderRadius:
-                                BorderRadius.circular(
+                                BorderRadius
+                                    .circular(
                                     12),
                               ),
                             ),
@@ -1621,6 +2017,10 @@ class _ActivitiesPageState
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
 
+  // ----------------------------------------------------------
+  // Reusable profile information row
+  // ----------------------------------------------------------
+
   Widget buildInfoRow({
     required IconData icon,
     required String title,
@@ -1637,17 +2037,29 @@ class ProfilePage extends StatelessWidget {
 
         children: [
           Container(
-            padding: const EdgeInsets.all(9),
+            width: 42,
+            height: 42,
+
+            alignment: Alignment.center,
 
             decoration: BoxDecoration(
-              color: UniConnectApp.cream,
+              color:
+              UniConnectApp.cream,
+
               borderRadius:
               BorderRadius.circular(11),
+
+              border: Border.all(
+                color:
+                UniConnectApp.burgundy
+                    .withOpacity(0.1),
+              ),
             ),
 
             child: Icon(
               icon,
-              color: UniConnectApp.burgundy,
+              color:
+              UniConnectApp.burgundy,
               size: 21,
             ),
           ),
@@ -1663,7 +2075,8 @@ class ProfilePage extends StatelessWidget {
                 Text(
                   title,
                   style: TextStyle(
-                    color: Colors.grey.shade600,
+                    color:
+                    Colors.grey.shade600,
                     fontSize: 12,
                   ),
                 ),
@@ -1673,7 +2086,8 @@ class ProfilePage extends StatelessWidget {
                 Text(
                   value,
                   style: const TextStyle(
-                    fontWeight: FontWeight.w600,
+                    fontWeight:
+                    FontWeight.w600,
                     fontSize: 14,
                   ),
                 ),
@@ -1701,31 +2115,39 @@ class ProfilePage extends StatelessWidget {
 
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.fromLTRB(
+
+              padding:
+              const EdgeInsets.fromLTRB(
                 20,
                 30,
                 20,
                 35,
               ),
 
-              decoration: const BoxDecoration(
-                color: UniConnectApp.burgundy,
+              decoration:
+              const BoxDecoration(
+                color:
+                UniConnectApp.burgundy,
 
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(30),
-                  bottomRight: Radius.circular(30),
+                borderRadius:
+                BorderRadius.only(
+                  bottomLeft:
+                  Radius.circular(30),
+                  bottomRight:
+                  Radius.circular(30),
                 ),
               ),
 
               child: Column(
                 children: [
-                  // Logo
                   Container(
                     width: 105,
                     height: 105,
-                    padding: const EdgeInsets.all(5),
+                    padding:
+                    const EdgeInsets.all(5),
 
-                    decoration: const BoxDecoration(
+                    decoration:
+                    const BoxDecoration(
                       color: Colors.white,
                       shape: BoxShape.circle,
                     ),
@@ -1738,18 +2160,21 @@ class ProfilePage extends StatelessWidget {
                     ),
                   ),
 
-                  const SizedBox(height: 15),
+                  const SizedBox(
+                      height: 15),
 
                   const Text(
                     'Jeevika Singathia',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 23,
-                      fontWeight: FontWeight.bold,
+                      fontWeight:
+                      FontWeight.bold,
                     ),
                   ),
 
-                  const SizedBox(height: 5),
+                  const SizedBox(
+                      height: 5),
 
                   const Text(
                     'Computer Science & Engineering',
@@ -1759,44 +2184,48 @@ class ProfilePage extends StatelessWidget {
                     ),
                   ),
 
-                  const SizedBox(height: 3),
+                  const SizedBox(
+                      height: 3),
 
                   const Text(
                     'Mody University',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 13,
-                      fontWeight: FontWeight.w600,
+                      fontWeight:
+                      FontWeight.w600,
                     ),
                   ),
                 ],
               ),
             ),
 
-            const SizedBox(height: 20),
+            const SizedBox(
+                height: 20),
 
             // ==================================================
-            // STATS
+            // PROFILE STATS
             // ==================================================
 
             Padding(
-              padding: const EdgeInsets.symmetric(
+              padding:
+              const EdgeInsets.symmetric(
                 horizontal: 16,
               ),
 
               child: Row(
                 children: [
-                  _profileStat(
+                  profileStat(
                     'CGPA',
                     '8.7',
                   ),
 
-                  _profileStat(
+                  profileStat(
                     'Semester',
                     '5',
                   ),
 
-                  _profileStat(
+                  profileStat(
                     'Events',
                     '3',
                   ),
@@ -1804,173 +2233,254 @@ class ProfilePage extends StatelessWidget {
               ),
             ),
 
-            const SizedBox(height: 20),
+            const SizedBox(
+                height: 20),
 
             // ==================================================
-            // STUDENT INFORMATION
+            // INFORMATION TITLE
             // ==================================================
 
             const Padding(
-              padding: EdgeInsets.symmetric(
+              padding:
+              EdgeInsets.symmetric(
                 horizontal: 20,
               ),
 
               child: Align(
-                alignment: Alignment.centerLeft,
+                alignment:
+                Alignment.centerLeft,
 
                 child: Text(
                   'Student Information',
                   style: TextStyle(
                     fontSize: 19,
-                    fontWeight: FontWeight.bold,
+                    fontWeight:
+                    FontWeight.bold,
                   ),
                 ),
               ),
             ),
 
-            const SizedBox(height: 10),
-
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-
-                child: Column(
-                  children: [
-                    buildInfoRow(
-                      icon: Icons.badge_outlined,
-                      title: 'Student ID',
-                      value: 'MU2024CSE001',
-                    ),
-
-                    const Divider(),
-
-                    buildInfoRow(
-                      icon: Icons.school_outlined,
-                      title: 'University',
-                      value: 'Mody University',
-                    ),
-
-                    const Divider(),
-
-                    buildInfoRow(
-                      icon: Icons.computer_outlined,
-                      title: 'Programme',
-                      value:
-                      'B.Tech Computer Science & Engineering',
-                    ),
-
-                    const Divider(),
-
-                    buildInfoRow(
-                      icon: Icons.email_outlined,
-                      title: 'Email',
-                      value:
-                      'student@university.edu',
-                    ),
-
-                    const Divider(),
-
-                    buildInfoRow(
-                      icon: Icons.calendar_today_outlined,
-                      title: 'Academic Year',
-                      value: '2024 - 2028',
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 10),
+            const SizedBox(
+                height: 10),
 
             // ==================================================
-            // EDIT PROFILE BUTTON
-            // ==================================================
-
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 16,
-              ),
-
-              child: SizedBox(
-                width: double.infinity,
-
-                child: OutlinedButton.icon(
-                  onPressed: () {
-                    ScaffoldMessenger.of(context)
-                        .showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                          'Edit Profile selected',
-                        ),
-                      ),
-                    );
-                  },
-
-                  icon: const Icon(
-                    Icons.edit_outlined,
-                  ),
-
-                  label: const Text(
-                    'Edit Profile',
-                  ),
-
-                  style:
-                  OutlinedButton.styleFrom(
-                    foregroundColor:
-                    UniConnectApp.burgundy,
-
-                    side: const BorderSide(
-                      color: UniConnectApp.burgundy,
-                    ),
-
-                    padding:
-                    const EdgeInsets.symmetric(
-                      vertical: 14,
-                    ),
-
-                    shape:
-                    RoundedRectangleBorder(
-                      borderRadius:
-                      BorderRadius.circular(12),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-
-            const SizedBox(height: 20),
-
-            // ==================================================
-            // UNIVERSITY CARD
+            // INFORMATION CONTAINER
             // ==================================================
 
             Container(
-              margin: const EdgeInsets.symmetric(
+              width: double.infinity,
+
+              margin:
+              const EdgeInsets.symmetric(
                 horizontal: 16,
               ),
 
-              padding: const EdgeInsets.all(18),
+              padding:
+              const EdgeInsets.all(16),
 
-              decoration: BoxDecoration(
-                color: const Color(0xFFE6F7F5),
+              decoration:
+              BoxDecoration(
+                color: Colors.white,
+
+                borderRadius:
+                BorderRadius.circular(20),
+
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black
+                        .withOpacity(0.05),
+                    blurRadius: 10,
+                    offset:
+                    const Offset(0, 4),
+                  ),
+                ],
+
+                border: Border.all(
+                  color:
+                  UniConnectApp.burgundy
+                      .withOpacity(0.08),
+                ),
+              ),
+
+              child: Column(
+                children: [
+                  buildInfoRow(
+                    icon:
+                    Icons.badge_outlined,
+                    title: 'Student ID',
+                    value:
+                    'MU2024CSE001',
+                  ),
+
+                  const Divider(),
+
+                  buildInfoRow(
+                    icon:
+                    Icons.school_outlined,
+                    title: 'University',
+                    value:
+                    'Mody University',
+                  ),
+
+                  const Divider(),
+
+                  buildInfoRow(
+                    icon:
+                    Icons.computer_outlined,
+                    title: 'Programme',
+                    value:
+                    'B.Tech Computer Science & Engineering',
+                  ),
+
+                  const Divider(),
+
+                  buildInfoRow(
+                    icon:
+                    Icons.email_outlined,
+                    title: 'Email',
+                    value:
+                    'student@university.edu',
+                  ),
+
+                  const Divider(),
+
+                  buildInfoRow(
+                    icon:
+                    Icons.calendar_today_outlined,
+                    title: 'Academic Year',
+                    value:
+                    '2024 - 2028',
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(
+                height: 12),
+
+            // ==================================================
+            // EDIT PROFILE
+            // ==================================================
+
+            Container(
+              margin:
+              const EdgeInsets.symmetric(
+                horizontal: 16,
+              ),
+
+              width: double.infinity,
+
+              child: OutlinedButton.icon(
+                onPressed: () {
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(
+                    const SnackBar(
+                      content: Text(
+                        'Edit Profile selected',
+                      ),
+                    ),
+                  );
+                },
+
+                icon: const Icon(
+                  Icons.edit_outlined,
+                ),
+
+                label: const Text(
+                  'Edit Profile',
+                ),
+
+                style:
+                OutlinedButton.styleFrom(
+                  foregroundColor:
+                  UniConnectApp.burgundy,
+
+                  side: const BorderSide(
+                    color:
+                    UniConnectApp.burgundy,
+                  ),
+
+                  padding:
+                  const EdgeInsets
+                      .symmetric(
+                    vertical: 14,
+                  ),
+
+                  shape:
+                  RoundedRectangleBorder(
+                    borderRadius:
+                    BorderRadius.circular(
+                        12),
+                  ),
+                ),
+              ),
+            ),
+
+            const SizedBox(
+                height: 18),
+
+            // ==================================================
+            // UNIVERSITY CONTAINER
+            // ==================================================
+
+            Container(
+              width: double.infinity,
+
+              margin:
+              const EdgeInsets.symmetric(
+                horizontal: 16,
+              ),
+
+              padding:
+              const EdgeInsets.all(18),
+
+              decoration:
+              BoxDecoration(
+                color:
+                const Color(0xFFE6F7F5),
+
                 borderRadius:
                 BorderRadius.circular(18),
+
+                border: Border.all(
+                  color:
+                  UniConnectApp.teal
+                      .withOpacity(0.2),
+                ),
               ),
 
               child: Row(
                 children: [
-                  const Icon(
-                    Icons.account_balance,
-                    color: UniConnectApp.teal,
-                    size: 32,
+                  Container(
+                    width: 50,
+                    height: 50,
+
+                    alignment:
+                    Alignment.center,
+
+                    decoration:
+                    const BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                    ),
+
+                    child: const Icon(
+                      Icons.account_balance,
+                      color:
+                      UniConnectApp.teal,
+                    ),
                   ),
 
-                  const SizedBox(width: 13),
+                  const SizedBox(
+                      width: 13),
 
                   const Expanded(
                     child: Column(
                       crossAxisAlignment:
-                      CrossAxisAlignment.start,
+                      CrossAxisAlignment
+                          .start,
 
                       children: [
                         Text(
@@ -1987,7 +2497,8 @@ class ProfilePage extends StatelessWidget {
                         Text(
                           'Student Campus Portal',
                           style: TextStyle(
-                            color: Colors.black54,
+                            color:
+                            Colors.black54,
                             fontSize: 12,
                           ),
                         ),
@@ -1997,7 +2508,8 @@ class ProfilePage extends StatelessWidget {
 
                   const Icon(
                     Icons.verified,
-                    color: UniConnectApp.teal,
+                    color:
+                    UniConnectApp.teal,
                   ),
                 ],
               ),
@@ -2012,41 +2524,58 @@ class ProfilePage extends StatelessWidget {
   // Profile stat
   // ----------------------------------------------------------
 
-  static Widget _profileStat(
+  Widget profileStat(
       String title,
       String value,
       ) {
     return Expanded(
       child: Container(
-        margin: const EdgeInsets.symmetric(
+        height: 80,
+
+        margin:
+        const EdgeInsets.symmetric(
           horizontal: 5,
         ),
 
-        padding: const EdgeInsets.symmetric(
-          vertical: 15,
-        ),
+        padding:
+        const EdgeInsets.all(12),
+
+        alignment: Alignment.center,
 
         decoration: BoxDecoration(
           color: Colors.white,
+
           borderRadius:
           BorderRadius.circular(16),
 
+          border: Border.all(
+            color:
+            UniConnectApp.burgundy
+                .withOpacity(0.08),
+          ),
+
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color:
+              Colors.black.withOpacity(0.05),
               blurRadius: 8,
             ),
           ],
         ),
 
         child: Column(
+          mainAxisAlignment:
+          MainAxisAlignment.center,
+
           children: [
             Text(
               value,
               style: const TextStyle(
-                color: UniConnectApp.burgundy,
+                color:
+                UniConnectApp.burgundy,
                 fontSize: 20,
-                fontWeight: FontWeight.bold,
+                fontWeight:
+                FontWeight.bold,
               ),
             ),
 
@@ -2055,7 +2584,8 @@ class ProfilePage extends StatelessWidget {
             Text(
               title,
               style: TextStyle(
-                color: Colors.grey.shade600,
+                color:
+                Colors.grey.shade600,
                 fontSize: 11,
               ),
             ),
