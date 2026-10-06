@@ -1,4 +1,11 @@
 import 'package:flutter/material.dart';
+import 'routes/app_routes.dart';
+import 'screens/timetable_screen.dart';
+import 'screens/services_screen.dart';
+import 'screens/service_detail_screen.dart';
+import 'screens/events_screen.dart';
+import 'screens/event_detail_screen.dart';
+import 'screens/unknown_screen.dart';
 
 void main() {
   runApp(const UniConnectApp());
@@ -80,10 +87,44 @@ class UniConnectApp extends StatelessWidget {
           ),
         ),
       ),
-      home: const MainPage(),
+      initialRoute: AppRoutes.home,
+      routes: {
+        AppRoutes.home: (_) => const MainPage(),
+        AppRoutes.timetable: (_) => const TimetableScreen(),
+        AppRoutes.services: (_) => const ServicesScreen(),
+        AppRoutes.events: (_) => const EventsScreen(),
+        AppRoutes.profile: (_) => const ProfilePage(),
+        AppRoutes.campusRequest: (_) => const CampusRequestPage(),
+      },
+      onGenerateRoute: (settings) {
+        if (settings.name == AppRoutes.serviceDetail) {
+          return MaterialPageRoute(
+            builder: (_) => const ServiceDetailScreen(),
+            settings: settings,
+          );
+        }
+
+        if (settings.name == AppRoutes.eventDetail) {
+          final event = settings.arguments as CampusEvent;
+
+          return MaterialPageRoute(
+            builder: (_) => EventDetailScreen(event: event),
+          );
+        }
+
+        return null;
+      },
+      onUnknownRoute: (settings) {
+        return MaterialPageRoute(
+          builder: (_) => const UnknownScreen(),
+        );
+      },
     );
   }
 }
+
+// Backward-compatible alias for the default Flutter widget test.
+typedef MyApp = UniConnectApp;
 
 // ============================================================
 // MAIN PAGE
@@ -312,110 +353,165 @@ class _MainPageState extends State<MainPage> {
             ),
           ),
 
-          // HOME
-          ListTile(
-            leading: const Icon(
-              Icons.home_outlined,
-              color: UniConnectApp.burgundy,
+          Expanded(
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  // HOME
+                  ListTile(
+                    leading: const Icon(
+                      Icons.home_outlined,
+                      color: UniConnectApp.burgundy,
+                    ),
+                    title: const Text('Home'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      setState(() => currentIndex = 0);
+                    },
+                  ),
+
+                  // ACTIVITIES
+                  ListTile(
+                    leading: const Icon(
+                      Icons.event_outlined,
+                      color: UniConnectApp.burgundy,
+                    ),
+                    title: const Text('Activities'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      setState(() => currentIndex = 1);
+                    },
+                  ),
+
+                  // PROFILE
+                  ListTile(
+                    leading: const Icon(
+                      Icons.person_outline,
+                      color: UniConnectApp.burgundy,
+                    ),
+                    title: const Text('Profile'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      setState(() => currentIndex = 2);
+                    },
+                  ),
+
+                  // TIMETABLE
+                  ListTile(
+                    leading: const Icon(
+                      Icons.calendar_month_outlined,
+                      color: UniConnectApp.burgundy,
+                    ),
+                    title: const Text('Timetable'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.pushNamed(
+                        context,
+                        AppRoutes.timetable,
+                      );
+                    },
+                  ),
+
+                  // CAMPUS SERVICES
+                  ListTile(
+                    leading: const Icon(
+                      Icons.miscellaneous_services_outlined,
+                      color: UniConnectApp.teal,
+                    ),
+                    title: const Text('Campus Services'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.pushNamed(
+                        context,
+                        AppRoutes.services,
+                      );
+                    },
+                  ),
+
+                  // CAMPUS EVENTS
+                  ListTile(
+                    leading: const Icon(
+                      Icons.event_outlined,
+                      color: UniConnectApp.teal,
+                    ),
+                    title: const Text('Campus Events'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.pushNamed(
+                        context,
+                        AppRoutes.events,
+                      );
+                    },
+                  ),
+
+                  // NEW CAMPUS REQUEST
+                  ListTile(
+                    leading: const Icon(
+                      Icons.assignment_outlined,
+                      color: UniConnectApp.teal,
+                    ),
+                    title: const Text('Campus Request'),
+                    subtitle: const Text(
+                      'Submit a service request',
+                    ),
+                    onTap: () {
+                      Navigator.pop(context);
+                      setState(() => currentIndex = 3);
+                    },
+                  ),
+
+                  const Divider(),
+
+                  ListTile(
+                    leading: const Icon(
+                      Icons.menu_book_outlined,
+                    ),
+                    title: const Text('My Courses'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      showMessage('My Courses selected');
+                    },
+                  ),
+
+                  ListTile(
+                    leading: const Icon(
+                      Icons.location_on_outlined,
+                    ),
+                    title: const Text('Campus Map'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      showMessage(
+                        'Campus Map coming soon!',
+                      );
+                    },
+                  ),
+
+                  ListTile(
+                    leading: const Icon(
+                      Icons.settings_outlined,
+                    ),
+                    title: const Text('Settings'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      showMessage('Settings selected');
+                    },
+                  ),
+
+                  ListTile(
+                    leading: const Icon(
+                      Icons.help_outline,
+                    ),
+                    title: const Text('Help Centre'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      showMessage('Help Centre selected');
+                    },
+                  ),
+
+                ],
+              ),
             ),
-            title: const Text('Home'),
-            onTap: () {
-              Navigator.pop(context);
-              setState(() => currentIndex = 0);
-            },
           ),
-
-          // ACTIVITIES
-          ListTile(
-            leading: const Icon(
-              Icons.event_outlined,
-              color: UniConnectApp.burgundy,
-            ),
-            title: const Text('Activities'),
-            onTap: () {
-              Navigator.pop(context);
-              setState(() => currentIndex = 1);
-            },
-          ),
-
-          // PROFILE
-          ListTile(
-            leading: const Icon(
-              Icons.person_outline,
-              color: UniConnectApp.burgundy,
-            ),
-            title: const Text('Profile'),
-            onTap: () {
-              Navigator.pop(context);
-              setState(() => currentIndex = 2);
-            },
-          ),
-
-          // NEW CAMPUS REQUEST
-          ListTile(
-            leading: const Icon(
-              Icons.assignment_outlined,
-              color: UniConnectApp.teal,
-            ),
-            title: const Text('Campus Request'),
-            subtitle: const Text(
-              'Submit a service request',
-            ),
-            onTap: () {
-              Navigator.pop(context);
-              setState(() => currentIndex = 3);
-            },
-          ),
-
-          const Divider(),
-
-          ListTile(
-            leading: const Icon(
-              Icons.menu_book_outlined,
-            ),
-            title: const Text('My Courses'),
-            onTap: () {
-              Navigator.pop(context);
-              showMessage('My Courses selected');
-            },
-          ),
-
-          ListTile(
-            leading: const Icon(
-              Icons.location_on_outlined,
-            ),
-            title: const Text('Campus Map'),
-            onTap: () {
-              Navigator.pop(context);
-              showMessage(
-                'Campus Map coming soon!',
-              );
-            },
-          ),
-
-          ListTile(
-            leading: const Icon(
-              Icons.settings_outlined,
-            ),
-            title: const Text('Settings'),
-            onTap: () {
-              Navigator.pop(context);
-              showMessage('Settings selected');
-            },
-          ),
-
-          ListTile(
-            leading: const Icon(
-              Icons.help_outline,
-            ),
-            title: const Text('Help Centre'),
-            onTap: () {
-              Navigator.pop(context);
-              showMessage('Help Centre selected');
-            },
-          ),
-
-          const Spacer(),
 
           Padding(
             padding: const EdgeInsets.all(16),
@@ -838,14 +934,9 @@ class HomePage extends StatelessWidget {
                     color:
                     UniConnectApp.burgundy,
                     onTap: () {
-                      ScaffoldMessenger
-                          .of(context)
-                          .showSnackBar(
-                        const SnackBar(
-                          content: Text(
-                            'Timetable opened',
-                          ),
-                        ),
+                      Navigator.pushNamed(
+                        context,
+                        AppRoutes.timetable,
                       );
                     },
                   ),
@@ -870,25 +961,31 @@ class HomePage extends StatelessWidget {
                     },
                   ),
                   CampusActionCard(
-                    icon:
-                    Icons.menu_book_outlined,
-                    title: 'Library',
-                    subtitle:
-                    'Books & resources',
-                    color:
-                    Colors.orange,
+                    icon: Icons.library_books_outlined,
+                    title: 'Campus Services',
+                    subtitle: 'Access university services',
+                    color: UniConnectApp.teal,
                     onTap: () {
-                      ScaffoldMessenger
-                          .of(context)
-                          .showSnackBar(
-                        const SnackBar(
-                          content: Text(
-                            'Library opened',
-                          ),
-                        ),
+                      Navigator.pushNamed(
+                        context,
+                        AppRoutes.services,
                       );
                     },
                   ),
+
+                  CampusActionCard(
+                    icon: Icons.event_outlined,
+                    title: 'Campus Events',
+                    subtitle: 'Explore upcoming events',
+                    color: UniConnectApp.burgundy,
+                    onTap: () {
+                      Navigator.pushNamed(
+                        context,
+                        AppRoutes.events,
+                      );
+                    },
+                  ),
+
                   CampusActionCard(
                     icon:
                     Icons.directions_bus_outlined,
@@ -1317,11 +1414,11 @@ class CampusActionCard extends StatelessWidget {
       onTap: onTap,
       child: Container(
         width: 160,
-        height: 120,
+        height: 145,
         margin:
         const EdgeInsets.all(5),
         padding:
-        const EdgeInsets.all(15),
+        const EdgeInsets.all(13),
         alignment:
         Alignment.centerLeft,
         constraints:
@@ -2663,8 +2760,7 @@ class _CampusRequestPageState
 
   void submitForm() {
     // First validate every field.
-    if (!_formKey.currentState!
-        .validate()) {
+    if (!_formKey.currentState!.validate()) {
       ScaffoldMessenger.of(context)
           .showSnackBar(
         const SnackBar(
@@ -2697,7 +2793,7 @@ class _CampusRequestPageState
     }
 
     // Save form values after successful validation.
-    _formKey.currentState!.save();
+    saveFormValues();
 
     showSubmissionSummary();
   }
