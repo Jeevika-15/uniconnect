@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "766778005278",
+    "project_id": "uniconnect-campus",
+    "storage_bucket": "uniconnect-campus.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:766778005278:android:5159cb26da814672939b0f",
+        "android_client_info": {
+          "package_name": "com.example.uniconnect"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAtOfhvNEvFDj98NxIgETalZdDFU8FxHqI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

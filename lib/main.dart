@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 import 'routes/app_routes.dart';
 import 'screens/timetable_screen.dart';
 import 'screens/services_screen.dart';
@@ -7,7 +11,11 @@ import 'screens/events_screen.dart';
 import 'screens/event_detail_screen.dart';
 import 'screens/unknown_screen.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const UniConnectApp());
 }
 
@@ -2547,6 +2555,8 @@ class _CampusRequestPageState
   String? selectedContact;
   DateTime? selectedDate;
   bool declarationAccepted = false;
+  bool _isSubmitting = false;
+  String? _lastRequestId;
 
   // Saved values for submission summary
   String savedName = '';
@@ -2758,47 +2768,125 @@ class _CampusRequestPageState
   // SUBMIT FORM
   // ----------------------------------------------------------
 
-  void submitForm() {
-    // First validate every field.
+  Future<void> submitForm() async {
+    if (_isSubmitting || _lastRequestId != null) return;
+
     if (!_formKey.currentState!.validate()) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
+      ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text(
-            'Please correct the highlighted fields.',
-          ),
-          behavior:
-          SnackBarBehavior.floating,
+          content: Text('Please correct the highlighted fields.'),
+          behavior: SnackBarBehavior.floating,
           backgroundColor: Colors.red,
         ),
       );
-
       return;
     }
 
-    if (!declarationAccepted) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
+    if (!declarationAccepted || selectedDate == null ||
+        selectedService == null || selectedUrgency == null ||
+        selectedContact == null ||
+        (selectedContact == 'Phone' && _phoneController.text.trim().isEmpty)) {
+      ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text(
-            'Please confirm the declaration before submitting.',
-          ),
-          behavior:
-          SnackBarBehavior.floating,
+          content: Text('Please select the date, service, urgency, contact method and declaration.'),
+          behavior: SnackBarBehavior.floating,
           backgroundColor: Colors.red,
         ),
       );
-
       return;
     }
 
-    // Save form values after successful validation.
     saveFormValues();
+    setState(() => _isSubmitting = true);
 
-    showSubmissionSummary();
+
+    try {
+      final auth = FirebaseAuth.instance;
+      final user = auth.currentUser ??
+          (await auth.signInAnonymously()).user;
+
+      if (user == null) {
+        throw StateError('Anonymous sign-in was not completed.');
+      }
+
+      print('UID: ${user.uid}');
+      print('Name: "$savedName"');
+      print('Student ID: "$savedStudentId"');
+      print('Service: "$savedService"');
+      print('Subject length: ${savedSubject.length}');
+      print('Description length: ${savedDetails.length}');
+      print('Urgency: "$savedUrgency"');
+      print('Preferred contact: "$savedContact"');
+      print('Date: $savedDate');
+
+      final requestRef = FirebaseFirestore.instance
+          .collection('campusRequests')
+          .doc();
+
+      await requestRef.set({
+        'ownerUid': user.uid,
+        'studentName': savedName,
+        'studentId': savedStudentId,
+        'email': savedEmail,
+        'phone': savedPhone,
+        'serviceCategory': savedService,
+        'subject': savedSubject,
+        'description': savedDetails,
+        'urgency': savedUrgency,
+        'preferredContact': savedContact,
+        'preferredDate': Timestamp.fromDate(DateTime(
+          savedDate!.year,
+          savedDate!.month,
+          savedDate!.day,
+        )),
+        'declaration': declarationAccepted,
+        'status': 'submitted',
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+
+      if (!mounted) return;
+
+      setState(() => _lastRequestId = requestRef.id);
+      showSubmissionSummary();
+    } on FirebaseException catch (e) {
+      print('Firebase error code: ${e.code}');
+      print('Firebase error message: ${e.message}');
+
+      if (!mounted) return;
+
+      final message = e.code == 'permission-denied'
+          ? 'Access denied. Check Anonymous Authentication and Firestore rules.'
+          : 'Could not save the request (${e.code}). Your entries are still here; please try again.';
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(message),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    } catch (e) {
+      print('Submission error: $e');
+
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Unable to submit the request. Check your connection and try again.',
+          ),
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _isSubmitting = false);
+      }
+    }
+
+
+    // ----------------------------------------------------------
   }
 
-  // ----------------------------------------------------------
   // FORM SAVE
   // ----------------------------------------------------------
 
@@ -2892,7 +2980,7 @@ class _CampusRequestPageState
                     ),
                   ),
                   child: const Text(
-                    'Your campus service request has been recorded successfully.',
+                    'Your campus service request was saved to Firestore.',
                     style: TextStyle(
                       color:
                       UniConnectApp
@@ -2913,6 +3001,10 @@ class _CampusRequestPageState
                 summaryRow(
                   'Student ID',
                   savedStudentId,
+                ),
+                summaryRow(
+                  'Reference',
+                  _lastRequestId ?? 'Pending',
                 ),
                 summaryRow(
                   'Service',
@@ -2967,38 +3059,30 @@ class _CampusRequestPageState
               ],
             ),
           ),
+
           actions: [
             ElevatedButton(
-              style:
-              ElevatedButton.styleFrom(
-                backgroundColor:
-                UniConnectApp.teal,
-                foregroundColor:
-                Colors.white,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: UniConnectApp.teal,
+                foregroundColor: Colors.white,
               ),
               onPressed: () {
                 Navigator.pop(context);
 
-                ScaffoldMessenger.of(
-                  this.context,
-                ).showSnackBar(
-                  const SnackBar(
+                ScaffoldMessenger.of(this.context).showSnackBar(
+                  SnackBar(
                     content: Text(
-                      'Request submitted successfully ✓',
+                      'Request submitted ✓ Reference: ${_lastRequestId ?? ''}',
                     ),
-                    behavior:
-                    SnackBarBehavior
-                        .floating,
-                    backgroundColor:
-                    UniConnectApp
-                        .burgundy,
+                    behavior: SnackBarBehavior.floating,
+                    backgroundColor: UniConnectApp.burgundy,
                   ),
                 );
               },
-              child:
-              const Text('Done'),
+              child: const Text('Done'),
             ),
           ],
+
         );
       },
     );
@@ -3066,6 +3150,7 @@ class _CampusRequestPageState
       selectedContact = null;
       selectedDate = null;
       declarationAccepted = false;
+      _lastRequestId = null;
     });
 
     ScaffoldMessenger.of(context)
@@ -4148,16 +4233,22 @@ class _CampusRequestPageState
                     flex: 2,
                     child:
                     ElevatedButton.icon(
-                      onPressed:
-                      submitForm,
-                      icon:
-                      const Icon(
-                        Icons
-                            .send_outlined,
-                      ),
-                      label:
-                      const Text(
-                        'Submit Request',
+                      onPressed: _isSubmitting || _lastRequestId != null
+                          ? null
+                          : submitForm,
+                      icon: _isSubmitting
+                          ? const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.white,
+                        ),
+                      )
+                          : const Icon(Icons.send_outlined),
+                      label: Text(
+                        _isSubmitting ? 'Saving...' :
+                        (_lastRequestId != null ? 'Submitted ✓' : 'Submit Request'),
                       ),
                       style:
                       ElevatedButton
@@ -4188,8 +4279,7 @@ class _CampusRequestPageState
                   Expanded(
                     child:
                     OutlinedButton.icon(
-                      onPressed:
-                      resetForm,
+                      onPressed: _isSubmitting ? null : resetForm,
                       icon:
                       const Icon(
                         Icons
