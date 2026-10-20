@@ -1,1 +1,38 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"uniconnect-campus","appId":"1:766778005278:android:5159cb26da814672939b0f","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"uniconnect-campus","configurations":{"android":"1:766778005278:android:5159cb26da814672939b0f","ios":"1:766778005278:ios:066d35e5a4064f16939b0f","web":"1:766778005278:web:f06ab373620002e1939b0f","windows":"1:766778005278:web:59d44792eb05461d939b0f"}}}}}}
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "uniconnect-campus",
+          "appId": "1:766778005278:android:5159cb26da814672939b0f",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "uniconnect-campus",
+          "configurations": {
+            "android": "1:766778005278:android:5159cb26da814672939b0f",
+            "ios": "1:766778005278:ios:066d35e5a4064f16939b0f",
+            "web": "1:766778005278:web:f06ab373620002e1939b0f",
+            "windows": "1:766778005278:web:59d44792eb05461d939b0f"
+          }
+        }
+      }
+    }
+  },
+  "hosting": {
+    "public": "build/web",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  }
+}

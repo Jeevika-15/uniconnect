@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
 import 'routes/app_routes.dart';
 import 'screens/timetable_screen.dart';
 import 'screens/services_screen.dart';
@@ -10,12 +8,17 @@ import 'screens/service_detail_screen.dart';
 import 'screens/events_screen.dart';
 import 'screens/event_detail_screen.dart';
 import 'screens/unknown_screen.dart';
+import 'my_requests_screen.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
   runApp(const UniConnectApp());
 }
 
@@ -153,6 +156,7 @@ class _MainPageState extends State<MainPage> {
     ActivitiesPage(),
     ProfilePage(),
     CampusRequestPage(),
+    MyRequestsScreen(),
   ];
 
   void showMessage(String message) {
@@ -540,8 +544,11 @@ class _MainPageState extends State<MainPage> {
   Widget build(BuildContext context) {
     // Bottom navigation only has 3 destinations.
     // When Campus Request is open, Home remains visually selected.
-    final int navigationIndex =
-    currentIndex > 2 ? 0 : currentIndex;
+    final int navigationIndex = currentIndex == 3
+        ? 0
+        : currentIndex == 4
+        ? 3
+        : currentIndex;
 
     return Scaffold(
       appBar: AppBar(
@@ -609,7 +616,7 @@ class _MainPageState extends State<MainPage> {
       BottomNavigationBar(
         currentIndex: navigationIndex,
         onTap: (index) {
-          setState(() => currentIndex = index);
+          setState(() => currentIndex = index == 3 ? 4 :index);
         },
         items: const [
           BottomNavigationBarItem(
@@ -627,6 +634,11 @@ class _MainPageState extends State<MainPage> {
             activeIcon: Icon(Icons.person),
             label: 'Profile',
           ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.assignment_outlined),
+            activeIcon: Icon(Icons.assignment),
+            label: 'My Requests',
+          ),
         ],
       ),
     );
@@ -636,6 +648,129 @@ class _MainPageState extends State<MainPage> {
 // ============================================================
 // HOME PAGE
 // ============================================================
+
+class AnimatedWelcomeBanner extends StatefulWidget {
+  const AnimatedWelcomeBanner({super.key});
+
+  @override
+  State<AnimatedWelcomeBanner> createState() => _AnimatedWelcomeBannerState();
+}
+
+class _AnimatedWelcomeBannerState extends State<AnimatedWelcomeBanner>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  late final Animation<double> _fade;
+  late final Animation<Offset> _slide;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 850),
+    );
+    _fade = CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic);
+    _slide = Tween<Offset>(
+      begin: const Offset(0, 0.12),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic));
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FadeTransition(
+      opacity: _fade,
+      child: SlideTransition(
+        position: _slide,
+        child: Container(
+          width: double.infinity,
+          margin: const EdgeInsets.symmetric(horizontal: 16),
+          padding: const EdgeInsets.all(20),
+          constraints: const BoxConstraints(minHeight: 180),
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              colors: [Color(0xFF6D1518), Color(0xFF9F2525), Color(0xFF7F1D1D)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(25),
+            boxShadow: [
+              BoxShadow(
+                color: UniConnectApp.burgundy.withOpacity(0.25),
+                blurRadius: 20,
+                offset: const Offset(0, 8),
+              ),
+            ],
+          ),
+          child: Stack(
+            children: [
+              Positioned(
+                right: -14,
+                top: -28,
+                child: Container(
+                  width: 125,
+                  height: 125,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white.withOpacity(0.10), width: 18),
+                  ),
+                ),
+              ),
+              Positioned(
+                right: 48,
+                bottom: -42,
+                child: Container(
+                  width: 100,
+                  height: 100,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white.withOpacity(0.055),
+                  ),
+                ),
+              ),
+              Row(
+                children: [
+                  Container(
+                    width: 75,
+                    height: 75,
+                    padding: const EdgeInsets.all(4),
+                    decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+                    child: ClipOval(
+                      child: Image.asset('assets/mody_logo.png', fit: BoxFit.cover),
+                    ),
+                  ),
+                  const SizedBox(width: 15),
+                  const Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text('Good morning, Jeevika 👋', style: TextStyle(color: Colors.white70, fontSize: 13)),
+                        SizedBox(height: 5),
+                        Text('Welcome to UniConnect', style: TextStyle(color: Colors.white, fontSize: 21, fontWeight: FontWeight.bold)),
+                        SizedBox(height: 8),
+                        Text('Computer Science & Engineering', style: TextStyle(color: Colors.white70, fontSize: 12)),
+                        SizedBox(height: 3),
+                        Text('Mody University', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w600)),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -713,114 +848,8 @@ class HomePage extends StatelessWidget {
           crossAxisAlignment:
           CrossAxisAlignment.start,
           children: [
-            // WELCOME CONTAINER
-            Container(
-              width: double.infinity,
-              margin:
-              const EdgeInsets.symmetric(
-                horizontal: 16,
-              ),
-              padding:
-              const EdgeInsets.all(20),
-              constraints:
-              const BoxConstraints(
-                minHeight: 180,
-              ),
-              decoration: BoxDecoration(
-                gradient:
-                const LinearGradient(
-                  colors: [
-                    UniConnectApp.burgundy,
-                    Color(0xFF991B1B),
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius:
-                BorderRadius.circular(25),
-                boxShadow: [
-                  BoxShadow(
-                    color: UniConnectApp
-                        .burgundy
-                        .withOpacity(0.25),
-                    blurRadius: 15,
-                    offset:
-                    const Offset(0, 7),
-                  ),
-                ],
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    width: 75,
-                    height: 75,
-                    padding:
-                    const EdgeInsets.all(4),
-                    decoration:
-                    const BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                    ),
-                    child: ClipOval(
-                      child: Image.asset(
-                        'assets/mody_logo.png',
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 15),
-                  const Expanded(
-                    child: Column(
-                      crossAxisAlignment:
-                      CrossAxisAlignment.start,
-                      mainAxisAlignment:
-                      MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Good morning, Jeevika 👋',
-                          style: TextStyle(
-                            color:
-                            Colors.white70,
-                            fontSize: 13,
-                          ),
-                        ),
-                        SizedBox(height: 5),
-                        Text(
-                          'Welcome to UniConnect',
-                          style: TextStyle(
-                            color:
-                            Colors.white,
-                            fontSize: 21,
-                            fontWeight:
-                            FontWeight.bold,
-                          ),
-                        ),
-                        SizedBox(height: 8),
-                        Text(
-                          'Computer Science & Engineering',
-                          style: TextStyle(
-                            color:
-                            Colors.white70,
-                            fontSize: 12,
-                          ),
-                        ),
-                        SizedBox(height: 3),
-                        Text(
-                          'Mody University',
-                          style: TextStyle(
-                            color:
-                            Colors.white,
-                            fontSize: 13,
-                            fontWeight:
-                            FontWeight.w600,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            // ANIMATED WELCOME BANNER
+            const AnimatedWelcomeBanner(),
 
             const SizedBox(height: 22),
 
@@ -2511,6 +2540,7 @@ class CampusRequestPage
 
 class _CampusRequestPageState
     extends State<CampusRequestPage> {
+  bool _isSubmitting = false;
   // ----------------------------------------------------------
   // FORM KEY
   // ----------------------------------------------------------
@@ -2555,8 +2585,6 @@ class _CampusRequestPageState
   String? selectedContact;
   DateTime? selectedDate;
   bool declarationAccepted = false;
-  bool _isSubmitting = false;
-  String? _lastRequestId;
 
   // Saved values for submission summary
   String savedName = '';
@@ -2769,8 +2797,9 @@ class _CampusRequestPageState
   // ----------------------------------------------------------
 
   Future<void> submitForm() async {
-    if (_isSubmitting || _lastRequestId != null) return;
+    if (_isSubmitting) return;
 
+    // Validate all existing form fields before writing anything.
     if (!_formKey.currentState!.validate()) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -2782,13 +2811,10 @@ class _CampusRequestPageState
       return;
     }
 
-    if (!declarationAccepted || selectedDate == null ||
-        selectedService == null || selectedUrgency == null ||
-        selectedContact == null ||
-        (selectedContact == 'Phone' && _phoneController.text.trim().isEmpty)) {
+    if (!declarationAccepted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Please select the date, service, urgency, contact method and declaration.'),
+          content: Text('Please confirm the declaration before submitting.'),
           behavior: SnackBarBehavior.floating,
           backgroundColor: Colors.red,
         ),
@@ -2796,97 +2822,93 @@ class _CampusRequestPageState
       return;
     }
 
-    saveFormValues();
+    if (selectedDate == null || selectedService == null ||
+        selectedUrgency == null || selectedContact == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please complete all required request options.'),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
     setState(() => _isSubmitting = true);
 
-
     try {
+      // Use the same Firebase anonymous account for submission and retrieval.
       final auth = FirebaseAuth.instance;
-      final user = auth.currentUser ??
-          (await auth.signInAnonymously()).user;
+      final User user = auth.currentUser ??
+          (await auth.signInAnonymously()).user!;
 
-      if (user == null) {
-        throw StateError('Anonymous sign-in was not completed.');
-      }
+      final String name = _nameController.text.trim();
+      final String studentId = _idController.text.trim();
+      final String email = _emailController.text.trim();
+      final String phone = _phoneController.text.trim();
+      final String service = selectedService!;
+      final String subject = _subjectController.text.trim();
+      final String description = _detailsController.text.trim();
+      final String urgency = selectedUrgency!;
+      final String preferredContact = selectedContact!;
+      final DateTime chosenDate = selectedDate!;
 
-      print('UID: ${user.uid}');
-      print('Name: "$savedName"');
-      print('Student ID: "$savedStudentId"');
-      print('Service: "$savedService"');
-      print('Subject length: ${savedSubject.length}');
-      print('Description length: ${savedDetails.length}');
-      print('Urgency: "$savedUrgency"');
-      print('Preferred contact: "$savedContact"');
-      print('Date: $savedDate');
-
-      final requestRef = FirebaseFirestore.instance
-          .collection('campusRequests')
-          .doc();
-
-      await requestRef.set({
+      // add() creates a NEW document ID every time. It never overwrites an
+      // older request, unlike set() on a fixed document ID.
+      final DocumentReference<Map<String, dynamic>> savedDocument =
+      await FirebaseFirestore.instance.collection('campusRequests').add({
         'ownerUid': user.uid,
-        'studentName': savedName,
-        'studentId': savedStudentId,
-        'email': savedEmail,
-        'phone': savedPhone,
-        'serviceCategory': savedService,
-        'subject': savedSubject,
-        'description': savedDetails,
-        'urgency': savedUrgency,
-        'preferredContact': savedContact,
-        'preferredDate': Timestamp.fromDate(DateTime(
-          savedDate!.year,
-          savedDate!.month,
-          savedDate!.day,
-        )),
-        'declaration': declarationAccepted,
+        'studentName': name,
+        'studentId': studentId,
+        'email': email,
+        'phone': phone,
+        'serviceCategory': service,
+        'subject': subject,
+        'description': description,
+        'urgency': urgency,
+        'preferredContact': preferredContact,
+        'preferredDate': Timestamp.fromDate(
+          DateTime(chosenDate.year, chosenDate.month, chosenDate.day),
+        ),
+        'declaration': true,
         'status': 'submitted',
         'createdAt': FieldValue.serverTimestamp(),
       });
 
+      // Only show success AFTER Firestore confirms the write.
       if (!mounted) return;
-
-      setState(() => _lastRequestId = requestRef.id);
+      saveFormValues();
+      setState(() => _isSubmitting = false);
       showSubmissionSummary();
+      debugPrint('CAMPUS REQUEST SAVED: ${savedDocument.id}');
     } on FirebaseException catch (e) {
-      print('Firebase error code: ${e.code}');
-      print('Firebase error message: ${e.message}');
-
       if (!mounted) return;
-
-      final message = e.code == 'permission-denied'
-          ? 'Access denied. Check Anonymous Authentication and Firestore rules.'
-          : 'Could not save the request (${e.code}). Your entries are still here; please try again.';
-
+      setState(() => _isSubmitting = false);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(message),
+          content: Text('Request was NOT saved (${e.code}): ${e.message ?? 'Firebase error'}'),
           behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.red.shade700,
+          duration: const Duration(seconds: 8),
         ),
       );
-    } catch (e) {
-      print('Submission error: $e');
-
+      debugPrint('CAMPUS REQUEST SAVE FAILED: ${e.code} ${e.message}');
+    } catch (e, stackTrace) {
       if (!mounted) return;
-
+      setState(() => _isSubmitting = false);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Unable to submit the request. Check your connection and try again.',
-          ),
+        SnackBar(
+          content: Text('Request was NOT saved: $e'),
           behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.red.shade700,
+          duration: const Duration(seconds: 8),
         ),
       );
-    } finally {
-      if (mounted) {
-        setState(() => _isSubmitting = false);
-      }
+      debugPrint('CAMPUS REQUEST SAVE FAILED: $e\n$stackTrace');
     }
-
-
-    // ----------------------------------------------------------
   }
 
+  // ----------------------------------------------------------
   // FORM SAVE
   // ----------------------------------------------------------
 
@@ -2980,7 +3002,7 @@ class _CampusRequestPageState
                     ),
                   ),
                   child: const Text(
-                    'Your campus service request was saved to Firestore.',
+                    'Your campus service request has been recorded successfully.',
                     style: TextStyle(
                       color:
                       UniConnectApp
@@ -3001,10 +3023,6 @@ class _CampusRequestPageState
                 summaryRow(
                   'Student ID',
                   savedStudentId,
-                ),
-                summaryRow(
-                  'Reference',
-                  _lastRequestId ?? 'Pending',
                 ),
                 summaryRow(
                   'Service',
@@ -3059,30 +3077,38 @@ class _CampusRequestPageState
               ],
             ),
           ),
-
           actions: [
             ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: UniConnectApp.teal,
-                foregroundColor: Colors.white,
+              style:
+              ElevatedButton.styleFrom(
+                backgroundColor:
+                UniConnectApp.teal,
+                foregroundColor:
+                Colors.white,
               ),
               onPressed: () {
                 Navigator.pop(context);
 
-                ScaffoldMessenger.of(this.context).showSnackBar(
-                  SnackBar(
+                ScaffoldMessenger.of(
+                  this.context,
+                ).showSnackBar(
+                  const SnackBar(
                     content: Text(
-                      'Request submitted ✓ Reference: ${_lastRequestId ?? ''}',
+                      'Request submitted successfully ✓',
                     ),
-                    behavior: SnackBarBehavior.floating,
-                    backgroundColor: UniConnectApp.burgundy,
+                    behavior:
+                    SnackBarBehavior
+                        .floating,
+                    backgroundColor:
+                    UniConnectApp
+                        .burgundy,
                   ),
                 );
               },
-              child: const Text('Done'),
+              child:
+              const Text('Done'),
             ),
           ],
-
         );
       },
     );
@@ -3150,7 +3176,6 @@ class _CampusRequestPageState
       selectedContact = null;
       selectedDate = null;
       declarationAccepted = false;
-      _lastRequestId = null;
     });
 
     ScaffoldMessenger.of(context)
@@ -4233,22 +4258,16 @@ class _CampusRequestPageState
                     flex: 2,
                     child:
                     ElevatedButton.icon(
-                      onPressed: _isSubmitting || _lastRequestId != null
-                          ? null
-                          : submitForm,
-                      icon: _isSubmitting
-                          ? const SizedBox(
-                        width: 18,
-                        height: 18,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: Colors.white,
-                        ),
-                      )
-                          : const Icon(Icons.send_outlined),
-                      label: Text(
-                        _isSubmitting ? 'Saving...' :
-                        (_lastRequestId != null ? 'Submitted ✓' : 'Submit Request'),
+                      onPressed:
+                      submitForm,
+                      icon:
+                      const Icon(
+                        Icons
+                            .send_outlined,
+                      ),
+                      label:
+                      const Text(
+                        'Submit Request',
                       ),
                       style:
                       ElevatedButton
@@ -4279,7 +4298,8 @@ class _CampusRequestPageState
                   Expanded(
                     child:
                     OutlinedButton.icon(
-                      onPressed: _isSubmitting ? null : resetForm,
+                      onPressed:
+                      resetForm,
                       icon:
                       const Icon(
                         Icons
